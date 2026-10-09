@@ -1,0 +1,8 @@
+{
+  "poses": 207,
+  "position_rmse_synthetic_units": 0.0041870880978288885,
+  "trajectory_diameter_synthetic_units": 1.1999789490372335,
+  "relative_position_rmse": 0.0034893012924837315,
+  "alignment": "Sim(3)",
+  "physical_camera_accuracy_measurement": false
+}

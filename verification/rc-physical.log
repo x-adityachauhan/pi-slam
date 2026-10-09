@@ -1,0 +1,63 @@
+RC-car research run: /home/kali/pi-slam/runs/rc-20261009-104940-MMObAZ
+Relative scale; no steering or flight-controller output.
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Monocular
+Loading settings from /home/kali/pi-slam/runs/rc-20261009-104940-MMObAZ/camera.yaml
+	-Loaded camera 1
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 582.997 584.03 323.304 231.705 ]
+	-Camera 1 distortion parameters: [  0.121366 -0.293075 0.00141978 0.00251451 0.152339 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 20
+	-Features per image: 1600
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+
+Loading ORB Vocabulary. This could take a while...
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: 
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+Frames 20 | state 1 | mean tracking 6.03599ms | skipped 0
+Frames 40 | state 1 | mean tracking 5.58612ms | skipped 0
+Frames 60 | state 1 | mean tracking 5.39588ms | skipped 0
+Frames 80 | state 1 | mean tracking 5.35718ms | skipped 0
+Frames 100 | state 1 | mean tracking 5.29229ms | skipped 0
+Frames 120 | state 1 | mean tracking 5.27851ms | skipped 0
+Frames 140 | state 1 | mean tracking 5.25913ms | skipped 0
+Frames 160 | state 1 | mean tracking 5.25724ms | skipped 0
+Frames 180 | state 1 | mean tracking 5.25248ms | skipped 0
+Frames 200 | state 1 | mean tracking 5.29088ms | skipped 0
+Frames 220 | state 1 | mean tracking 5.33881ms | skipped 0
+Frames 240 | state 1 | mean tracking 5.34824ms | skipped 0
+Shutdown
+Starting to write the save binary file
+End to write save binary file
+Saved run to "/home/kali/pi-slam/runs/rc-20261009-104940-MMObAZ"
+SLAM saved. Reconstructing colored 3D surfaces from final optimized poses...
+No final optimized map poses; finish SLAM first

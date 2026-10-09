@@ -1,0 +1,48 @@
+diff --git a/components/pango_image/src/image_io_jpg.cpp b/components/pango_image/src/image_io_jpg.cpp
+index 28002ec..b1449c6 100644
+--- a/components/pango_image/src/image_io_jpg.cpp
++++ b/components/pango_image/src/image_io_jpg.cpp
+@@ -1,5 +1,6 @@
+ #include <algorithm>
+ #include <fstream>
++#include <cstdint>
+ 
+ 
+ #include <pangolin/platform.h>
+diff --git a/components/pango_image/src/image_io_packed12bit.cpp b/components/pango_image/src/image_io_packed12bit.cpp
+index 39794d4..4a9ac65 100644
+--- a/components/pango_image/src/image_io_packed12bit.cpp
++++ b/components/pango_image/src/image_io_packed12bit.cpp
+@@ -1,5 +1,6 @@
+ #include <fstream>
+ #include <memory>
++#include <cstdint>
+ 
+ #include <pangolin/image/typed_image.h>
+ 
+diff --git a/components/pango_packetstream/include/pangolin/log/packetstream_tags.h b/components/pango_packetstream/include/pangolin/log/packetstream_tags.h
+index 2798fec..6bd0e1a 100644
+--- a/components/pango_packetstream/include/pangolin/log/packetstream_tags.h
++++ b/components/pango_packetstream/include/pangolin/log/packetstream_tags.h
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <string>
++#include <cstdint>
+ 
+ namespace pangolin {
+ 
+diff --git a/components/pango_windowing/CMakeLists.txt b/components/pango_windowing/CMakeLists.txt
+index ffc9ad6..d66c549 100644
+--- a/components/pango_windowing/CMakeLists.txt
++++ b/components/pango_windowing/CMakeLists.txt
+@@ -35,7 +35,8 @@ else()
+     find_package(PkgConfig)
+     pkg_check_modules(WAYLAND_CLIENT wayland-client QUIET)
+     pkg_check_modules(wayland-protocols QUIET wayland-protocols>=1.13)
+-    if(WAYLAND_CLIENT_FOUND AND wayland-protocols_FOUND)
++    option(PI_SLAM_WAYLAND "Build the optional Wayland window backend" OFF)
++    if(PI_SLAM_WAYLAND AND WAYLAND_CLIENT_FOUND AND wayland-protocols_FOUND)
+         pkg_check_modules(WAYLAND_EGL wayland-egl REQUIRED)
+         pkg_check_modules(WAYLAND_CURSOR wayland-cursor REQUIRED)
+         pkg_check_modules(xkbcommon REQUIRED xkbcommon)

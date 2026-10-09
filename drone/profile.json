@@ -1,0 +1,10 @@
+{
+  "purpose": "GPS-denied drone bench research",
+  "flight_output_enabled": false,
+  "camera": {"model": "Pi Camera v1.3 / OV5647", "width": 640, "height": 480, "fps": 20, "calibration": "calibration/intrinsics.json"},
+  "imu": {"available": false, "calibrated": false, "shared_camera_clock": false},
+  "depth": {"available": false, "measured_metric": false},
+  "flight_controller": {"firmware": null, "model": null},
+  "supervisor": {"max_result_age_s": 0.2, "max_receipt_to_result_ms": 100.0, "min_tracked_landmarks": 30, "recovery_frames": 10},
+  "notes": "Thresholds are bench defaults, not a flight qualification. Do not mark unknown hardware available."
+}

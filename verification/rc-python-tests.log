@@ -1,0 +1,25 @@
+test_calibration_recovers_known_synthetic_intrinsics (test_pipeline.PipelineTests.test_calibration_recovers_known_synthetic_intrinsics) ... ok
+test_calibration_rejects_missing_views (test_pipeline.PipelineTests.test_calibration_rejects_missing_views) ... ok
+test_fragmented_stream_preserves_capture_timestamp_and_pixels (test_pipeline.PipelineTests.test_fragmented_stream_preserves_capture_timestamp_and_pixels) ... ok
+test_local_viewer_serves_map_and_image (test_pipeline.PipelineTests.test_local_viewer_serves_map_and_image) ... ok
+test_non_monotonic_timestamp_is_rejected (test_pipeline.PipelineTests.test_non_monotonic_timestamp_is_rejected) ... ok
+test_orb_settings_have_required_numeric_types (test_pipeline.PipelineTests.test_orb_settings_have_required_numeric_types) ... ok
+test_v4l2_native_layout (test_pipeline.PipelineTests.test_v4l2_native_layout) ... ok
+test_camera_only_never_passes_metric_gate (test_rc_mapping.RCMappingTests.test_camera_only_never_passes_metric_gate) ... ok
+test_camera_to_world_rotation_is_applied (test_rc_mapping.RCMappingTests.test_camera_to_world_rotation_is_applied) ... ok
+test_candidates_need_translation (test_rc_mapping.RCMappingTests.test_candidates_need_translation) ... ok
+test_gate_rejects_stale_lost_reset_and_nan_pose (test_rc_mapping.RCMappingTests.test_gate_rejects_stale_lost_reset_and_nan_pose) ... ok
+test_gate_requires_recovery_and_rejects_position_jump (test_rc_mapping.RCMappingTests.test_gate_requires_recovery_and_rejects_position_jump) ... ok
+test_many_samples_from_one_pair_do_not_fake_multiview_support (test_rc_mapping.RCMappingTests.test_many_samples_from_one_pair_do_not_fake_multiview_support) ... ok
+test_negative_disparity_baseline_recovers_same_plane (test_rc_mapping.RCMappingTests.test_negative_disparity_baseline_recovers_same_plane) ... ok
+test_positive_baseline_recovers_known_3d_plane (test_rc_mapping.RCMappingTests.test_positive_baseline_recovers_known_3d_plane) ... ok
+test_pure_rotation_rejected (test_rc_mapping.RCMappingTests.test_pure_rotation_rejected) ... ok
+test_recorded_paths_cannot_escape_session (test_rc_mapping.RCMappingTests.test_recorded_paths_cannot_escape_session) ... ok
+test_untextured_images_produce_no_surfaces (test_rc_mapping.RCMappingTests.test_untextured_images_produce_no_surfaces) ... ok
+test_voxel_fusion_and_capacity_are_bounded (test_rc_mapping.RCMappingTests.test_voxel_fusion_and_capacity_are_bounded) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 4.164s
+
+OK
+Saved calibration: /tmp/tmpcz8mpeqt/out/camera.yaml; held-out error 0.189px

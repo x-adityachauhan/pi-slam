@@ -1,0 +1,9 @@
+{
+  "points": 19495,
+  "alignment": "Sim(3), scale intentionally removed",
+  "physical_accuracy_measurement": false,
+  "units": "procedural scene units",
+  "median_nearest_surface_error": 0.022859221853670064,
+  "p90_nearest_surface_error": 0.07131008989350873,
+  "fraction_within_0_1_scene_units": 0.9560913054629392
+}

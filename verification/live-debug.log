@@ -1,0 +1,211 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Monocular
+Loading settings from /home/kali/pi-slam/runs/orb-20261009-101556-ZdnSCb/camera.yaml
+	-Loaded camera 1
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 582.997 584.03 323.304 231.705 ]
+	-Camera 1 distortion parameters: [  0.121366 -0.293075 0.00141978 0.00251451 0.152339 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 20
+	-Features per image: 1600
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+
+Loading ORB Vocabulary. This could take a while...
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: 
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+[New Thread 0x7fffd40316c0 (LWP 61238) (id 2)]
+[New Thread 0x7fffd38306c0 (LWP 61239) (id 3)]
+[New Thread 0x7fffd302f6c0 (LWP 61240) (id 4)]
+[New Thread 0x7fffd282e6c0 (LWP 61241) (id 5)]
+[New Thread 0x7fffc0dff6c0 (LWP 61242) (id 6)]
+[New Thread 0x7fffbbfff6c0 (LWP 61243) (id 7)]
+[New Thread 0x7fffbb7fe6c0 (LWP 61244) (id 8)]
+[New Thread 0x7fffbaffd6c0 (LWP 61245) (id 9)]
+[New Thread 0x7fffba7fc6c0 (LWP 61247) (id 10)]
+[New Thread 0x7fffb9ffb6c0 (LWP 61248) (id 11)]
+Starting the Viewer
+[New Thread 0x7fffb94a96c0 (LWP 61260) (id 12)]
+[New Thread 0x7fffb8ca86c0 (LWP 61261) (id 13)]
+[New Thread 0x7fffabfff6c0 (LWP 61262) (id 14)]
+[New Thread 0x7fffab7fe6c0 (LWP 61263) (id 15)]
+[New Thread 0x7fffaaffd6c0 (LWP 61264) (id 16)]
+[New Thread 0x7fffaa7fc6c0 (LWP 61265) (id 17)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61489) (id 18)]
+[New Thread 0x7fffa97fa6c0 (LWP 61490) (id 19)]
+[Thread 0x7fffa97fa6c0 (LWP 61490) (id 19) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61489) (id 18) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61497) (id 20)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61498) (id 21)]
+[Thread 0x7fffa97fa6c0 (LWP 61497) (id 20) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61498) (id 21) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61499) (id 22)]
+[New Thread 0x7fffa97fa6c0 (LWP 61500) (id 23)]
+[Thread 0x7fffa97fa6c0 (LWP 61500) (id 23) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61499) (id 22) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61501) (id 24)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61502) (id 25)]
+[Thread 0x7fffa9ffb6c0 (LWP 61502) (id 25) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61501) (id 24) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61503) (id 26)]
+[New Thread 0x7fffa97fa6c0 (LWP 61504) (id 27)]
+[Thread 0x7fffa97fa6c0 (LWP 61504) (id 27) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61503) (id 26) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61505) (id 28)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61506) (id 29)]
+[Thread 0x7fffa9ffb6c0 (LWP 61506) (id 29) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61505) (id 28) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61507) (id 30)]
+[New Thread 0x7fffa97fa6c0 (LWP 61508) (id 31)]
+[Thread 0x7fffa97fa6c0 (LWP 61508) (id 31) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61507) (id 30) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61515) (id 32)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61516) (id 33)]
+[Thread 0x7fffa97fa6c0 (LWP 61515) (id 32) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61516) (id 33) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61517) (id 34)]
+[New Thread 0x7fffa97fa6c0 (LWP 61518) (id 35)]
+[Thread 0x7fffa97fa6c0 (LWP 61518) (id 35) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61517) (id 34) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61519) (id 36)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61520) (id 37)]
+[Thread 0x7fffa9ffb6c0 (LWP 61520) (id 37) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61519) (id 36) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61521) (id 38)]
+[New Thread 0x7fffa97fa6c0 (LWP 61522) (id 39)]
+[Thread 0x7fffa9ffb6c0 (LWP 61521) (id 38) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61522) (id 39) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61523) (id 40)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61524) (id 41)]
+[Thread 0x7fffa9ffb6c0 (LWP 61524) (id 41) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61523) (id 40) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61525) (id 42)]
+[New Thread 0x7fffa97fa6c0 (LWP 61526) (id 43)]
+[Thread 0x7fffa97fa6c0 (LWP 61526) (id 43) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61525) (id 42) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61527) (id 44)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61528) (id 45)]
+[Thread 0x7fffa97fa6c0 (LWP 61527) (id 44) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61528) (id 45) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61529) (id 46)]
+[New Thread 0x7fffa97fa6c0 (LWP 61530) (id 47)]
+[Thread 0x7fffa97fa6c0 (LWP 61530) (id 47) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61529) (id 46) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61531) (id 48)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61532) (id 49)]
+[Thread 0x7fffa97fa6c0 (LWP 61531) (id 48) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61532) (id 49) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61533) (id 50)]
+[New Thread 0x7fffa97fa6c0 (LWP 61534) (id 51)]
+[Thread 0x7fffa97fa6c0 (LWP 61534) (id 51) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61533) (id 50) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61541) (id 52)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61542) (id 53)]
+[Thread 0x7fffa9ffb6c0 (LWP 61542) (id 53) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61541) (id 52) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61543) (id 54)]
+[New Thread 0x7fffa97fa6c0 (LWP 61544) (id 55)]
+[Thread 0x7fffa97fa6c0 (LWP 61544) (id 55) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61543) (id 54) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61545) (id 56)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61546) (id 57)]
+[Thread 0x7fffa9ffb6c0 (LWP 61546) (id 57) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61545) (id 56) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61547) (id 58)]
+[New Thread 0x7fffa97fa6c0 (LWP 61548) (id 59)]
+[Thread 0x7fffa97fa6c0 (LWP 61548) (id 59) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61547) (id 58) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61549) (id 60)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61550) (id 61)]
+[Thread 0x7fffa9ffb6c0 (LWP 61550) (id 61) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61549) (id 60) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61551) (id 62)]
+[New Thread 0x7fffa97fa6c0 (LWP 61552) (id 63)]
+[Thread 0x7fffa97fa6c0 (LWP 61552) (id 63) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61551) (id 62) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61553) (id 64)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61554) (id 65)]
+[Thread 0x7fffa9ffb6c0 (LWP 61554) (id 65) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61553) (id 64) exited]
+[New Thread 0x7fffa9ffb6c0 (LWP 61555) (id 66)]
+[New Thread 0x7fffa97fa6c0 (LWP 61556) (id 67)]
+[Thread 0x7fffa97fa6c0 (LWP 61556) (id 67) exited]
+[Thread 0x7fffa9ffb6c0 (LWP 61555) (id 66) exited]
+[New Thread 0x7fffa97fa6c0 (LWP 61557) (id 68)]
+[New Thread 0x7fffa9ffb6c0 (LWP 61558) (id 69)]
+[Thread 0x7fffa9ffb6c0 (LWP 61558) (id 69) exited]
+[Thread 0x7fffa97fa6c0 (LWP 61557) (id 68) exited]
+Frames 20 | state 1 | mean tracking 17.9333ms | skipped 3
+Frames 40 | state 1 | mean tracking 14.5641ms | skipped 3
+Frames 60 | state 1 | mean tracking 13.0445ms | skipped 3
+Frames 80 | state 1 | mean tracking 12.3393ms | skipped 3
+Frames 100 | state 1 | mean tracking 11.9743ms | skipped 3
+Frames 120 | state 1 | mean tracking 11.5864ms | skipped 3
+Frames 140 | state 1 | mean tracking 11.225ms | skipped 3
+Frames 160 | state 1 | mean tracking 11.5962ms | skipped 3
+Frames 180 | state 1 | mean tracking 11.7597ms | skipped 3
+Frames 200 | state 1 | mean tracking 11.5913ms | skipped 3
+Frames 220 | state 1 | mean tracking 11.4477ms | skipped 3
+Frames 240 | state 1 | mean tracking 11.5089ms | skipped 3
+Frames 260 | state 1 | mean tracking 11.6033ms | skipped 3
+Frames 280 | state 1 | mean tracking 11.6876ms | skipped 3
+Frames 300 | state 1 | mean tracking 11.9819ms | skipped 3
+Frames 320 | state 1 | mean tracking 12.6036ms | skipped 3
+Frames 340 | state 1 | mean tracking 12.7786ms | skipped 3
+First KF:0; Map init KF:0
+New Map created with 85 points
+Frames 360 | state 2 | mean tracking 13.1452ms | skipped 3
+Frames 380 | state 2 | mean tracking 13.5041ms | skipped 3
+Shutdown
+[Thread 0x7fffd38306c0 (LWP 61239) (id 3) exited]
+[Thread 0x7fffd40316c0 (LWP 61238) (id 2) exited]
+[Thread 0x7fffd302f6c0 (LWP 61240) (id 4) exited]
+Starting to write the save binary file
+End to write save binary file
+[Thread 0x7fffd282e6c0 (LWP 61241) (id 5) exited]
+[Thread 0x7fffb9ffb6c0 (LWP 61248) (id 11) exited]
+[Thread 0x7fffba7fc6c0 (LWP 61247) (id 10) exited]
+[Thread 0x7fffbb7fe6c0 (LWP 61244) (id 8) exited]
+[Thread 0x7fffbbfff6c0 (LWP 61243) (id 7) exited]
+[Thread 0x7fffc0dff6c0 (LWP 61242) (id 6) exited]
+map_0: 1165 reliable points, 22 keyframes
+Saved run to "/home/kali/pi-slam/runs/orb-20261009-101556-ZdnSCb"
+[Thread 0x7fffab7fe6c0 (LWP 61263) (id 15) exited]
+[Thread 0x7fffaaffd6c0 (LWP 61264) (id 16) exited]
+[Thread 0x7fffabfff6c0 (LWP 61262) (id 14) exited]
+[Thread 0x7fffb8ca86c0 (LWP 61261) (id 13) exited]
+[Thread 0x7fffb94a96c0 (LWP 61260) (id 12) exited]
+[Thread 0x7fffbaffd6c0 (LWP 61245) (id 9) exited]
+[Thread 0x7fffee3cf980 (LWP 61185) (id 1) exited]
+[Thread 0x7fffaa7fc6c0 (LWP 61265) (id 17) exited]
+[New process 61185 (id 70)]
+[Inferior 1 (process 61185) exited normally]

@@ -1,0 +1,59 @@
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Monocular
+Loading settings from /home/kali/pi-slam/verification/synthetic/camera.yaml
+	-Loaded camera 1
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+System.SaveAtlasToFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 520 520 320 240 ]
+	-Camera 1 distortion parameters: [  0 0 0 0 0 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 20
+	-Features per image: 1600
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+
+Loading ORB Vocabulary. This could take a while...
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: 
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+First KF:0; Map init KF:0
+New Map created with 294 points
+Frames 20 | state 2 | mean tracking 74.4518ms | skipped 9
+Frames 40 | state 2 | mean tracking 56.7137ms | skipped 10
+Frames 60 | state 2 | mean tracking 50.9965ms | skipped 10
+Frames 80 | state 2 | mean tracking 48.0411ms | skipped 10
+Frames 100 | state 2 | mean tracking 46.4427ms | skipped 10
+Frames 120 | state 2 | mean tracking 45.3602ms | skipped 10
+Frames 140 | state 2 | mean tracking 44.593ms | skipped 10
+Frames 160 | state 2 | mean tracking 44.1803ms | skipped 10
+Frames 180 | state 2 | mean tracking 43.8277ms | skipped 10
+Frames 200 | state 2 | mean tracking 43.4416ms | skipped 10
+Shutdown
+map_0: 1835 reliable points, 29 keyframes
+Saved run to "/home/kali/pi-slam/verification/synthetic/run"

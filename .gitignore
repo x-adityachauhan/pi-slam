@@ -1,0 +1,23 @@
+/env/
+/mamba/
+/tools/
+/vendor/
+/build/
+__pycache__/
+*.py[cod]
+/*.log
+/runs/
+/calibration/images/
+/verification/live_camera*.jpg
+/Camera calibration_screenshot_*.png
+/verification/synthetic/run/
+/verification/rc-synthetic/run/
+*.tar.gz
+/gpu/models.zip
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.vscode/
+.idea/

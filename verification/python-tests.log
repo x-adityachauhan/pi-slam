@@ -1,0 +1,13 @@
+test_calibration_recovers_known_synthetic_intrinsics (test_pipeline.PipelineTests.test_calibration_recovers_known_synthetic_intrinsics) ... ok
+test_calibration_rejects_missing_views (test_pipeline.PipelineTests.test_calibration_rejects_missing_views) ... ok
+test_fragmented_stream_preserves_capture_timestamp_and_pixels (test_pipeline.PipelineTests.test_fragmented_stream_preserves_capture_timestamp_and_pixels) ... ok
+test_local_viewer_serves_map_and_image (test_pipeline.PipelineTests.test_local_viewer_serves_map_and_image) ... ok
+test_non_monotonic_timestamp_is_rejected (test_pipeline.PipelineTests.test_non_monotonic_timestamp_is_rejected) ... ok
+test_orb_settings_have_required_numeric_types (test_pipeline.PipelineTests.test_orb_settings_have_required_numeric_types) ... ok
+test_v4l2_native_layout (test_pipeline.PipelineTests.test_v4l2_native_layout) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 4.198s
+
+OK
+Saved calibration: /tmp/tmp5dnsolqo/out/camera.yaml; held-out error 0.189px

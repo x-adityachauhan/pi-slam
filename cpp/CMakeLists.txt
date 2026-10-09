@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.16)
+project(pi_slam_live LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs highgui)
+find_package(Eigen3 REQUIRED)
+find_package(Pangolin REQUIRED)
+find_package(Boost REQUIRED COMPONENTS serialization)
+find_package(Threads REQUIRED)
+set(ORB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ORB_SLAM3")
+add_executable(pi_slam_live live.cc)
+add_executable(pi_slam_save_test ../tests/save_regression.cc)
+foreach(target pi_slam_live pi_slam_save_test)
+target_include_directories(${target} PRIVATE ${ORB_DIR} ${ORB_DIR}/include ${ORB_DIR}/include/CameraModels
+    ${ORB_DIR}/Thirdparty/Sophus ${OpenCV_INCLUDE_DIRS} ${Pangolin_INCLUDE_DIRS})
+target_link_libraries(${target} PRIVATE ${ORB_DIR}/lib/libORB_SLAM3.so
+    Eigen3::Eigen ${OpenCV_LIBS} ${Pangolin_LIBRARIES} Boost::serialization Threads::Threads)
+set_target_properties(${target} PROPERTIES BUILD_RPATH
+    "${ORB_DIR}/lib;${ORB_DIR}/Thirdparty/DBoW2/lib;${ORB_DIR}/Thirdparty/g2o/lib;${CMAKE_PREFIX_PATH}/lib")
+endforeach()

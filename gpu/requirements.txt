@@ -1,0 +1,12 @@
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+einops==0.8.1
+yacs==0.1.8
+numba==0.61.2
+pypose==0.7.3
+kornia==0.7.4
+plyfile==1.1.2
+evo==1.31.0
+tqdm==4.67.1
+ninja==1.11.1.4
+setuptools==75.8.0

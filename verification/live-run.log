@@ -1,0 +1,195 @@
+
+ORB-SLAM3 Copyright (C) 2017-2020 Carlos Campos, Richard Elvira, Juan J. Gómez, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+ORB-SLAM2 Copyright (C) 2014-2016 Raúl Mur-Artal, José M.M. Montiel and Juan D. Tardós, University of Zaragoza.
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it
+under certain conditions. See LICENSE.txt.
+
+Input sensor was set to: Monocular
+Loading settings from /home/kali/pi-slam/runs/orb-20261009-101254-1uErca/camera.yaml
+	-Loaded camera 1
+Camera.newHeight optional parameter does not exist...
+Camera.newWidth optional parameter does not exist...
+	-Loaded image info
+	-Loaded ORB settings
+Viewer.imageViewScale optional parameter does not exist...
+	-Loaded viewer settings
+System.LoadAtlasFromFile optional parameter does not exist...
+	-Loaded Atlas settings
+System.thFarPoints optional parameter does not exist...
+	-Loaded misc parameters
+----------------------------------
+SLAM settings: 
+	-Camera 1 parameters (Pinhole): [ 582.997 584.03 323.304 231.705 ]
+	-Camera 1 distortion parameters: [  0.121366 -0.293075 0.00141978 0.00251451 0.152339 ]
+	-Original image size: [ 640 , 480 ]
+	-Current image size: [ 640 , 480 ]
+	-Sequence FPS: 20
+	-Features per image: 1600
+	-ORB scale factor: 1.2
+	-ORB number of scales: 8
+	-Initial FAST threshold: 20
+	-Min FAST threshold: 7
+
+
+Loading ORB Vocabulary. This could take a while...
+Vocabulary loaded!
+
+Initialization of Atlas from scratch 
+Creation of new map with id: 0
+Creation of new map with last KF id: 0
+Seq. Name: 
+There are 1 cameras in the atlas
+Camera 0 is pinhole
+Starting the Viewer
+Frames 20 | state 1 | mean tracking 6.73289ms | skipped 2
+Frames 40 | state 1 | mean tracking 6.22214ms | skipped 2
+Frames 60 | state 1 | mean tracking 5.98135ms | skipped 2
+Frames 80 | state 1 | mean tracking 5.80983ms | skipped 2
+Frames 100 | state 1 | mean tracking 5.69329ms | skipped 2
+Frames 120 | state 1 | mean tracking 5.63182ms | skipped 2
+Frames 140 | state 1 | mean tracking 5.56738ms | skipped 2
+Frames 160 | state 1 | mean tracking 5.54756ms | skipped 2
+Frames 180 | state 1 | mean tracking 5.89208ms | skipped 2
+Frames 200 | state 1 | mean tracking 6.22275ms | skipped 2
+Frames 220 | state 1 | mean tracking 6.31506ms | skipped 2
+Frames 240 | state 1 | mean tracking 6.35727ms | skipped 2
+Frames 260 | state 1 | mean tracking 6.42536ms | skipped 2
+Frames 280 | state 1 | mean tracking 6.63599ms | skipped 2
+First KF:0; Map init KF:0
+New Map created with 122 points
+Frames 300 | state 2 | mean tracking 7.22672ms | skipped 2
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Frames 320 | state 3 | mean tracking 7.68537ms | skipped 2
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Frames 340 | state 3 | mean tracking 8.31924ms | skipped 2
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Frames 360 | state 3 | mean tracking 8.79285ms | skipped 2
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+SYSTEM-> Reseting active map in monocular case
+LM: Active map reset recieved
+LM: Active map reset, waiting...
+LM: Reseting current map in Local Mapping...
+LM: End reseting Local Mapping...
+LM: Reset free the mutex
+LM: Active map reset, Done!!!
+mnFirstFrameId = 293
+mnInitialFrameId = 0
+71 Frames set to lost
+Frames 380 | state 1 | mean tracking 9.15977ms | skipped 2
+Frames 400 | state 1 | mean tracking 9.49634ms | skipped 2
+Frames 420 | state 1 | mean tracking 9.77871ms | skipped 2
+Frames 440 | state 1 | mean tracking 10.0741ms | skipped 2
+Frames 460 | state 1 | mean tracking 10.3524ms | skipped 2
+Frames 480 | state 1 | mean tracking 10.6437ms | skipped 2
+Frames 500 | state 1 | mean tracking 10.8621ms | skipped 2
+Frames 520 | state 1 | mean tracking 11.1437ms | skipped 2
+First KF:7; Map init KF:0
+New Map created with 252 points
+Frames 540 | state 2 | mean tracking 11.4608ms | skipped 2
+Frames 560 | state 2 | mean tracking 11.7507ms | skipped 2
+Frames 580 | state 2 | mean tracking 12.1323ms | skipped 2
+Frames 600 | state 2 | mean tracking 12.493ms | skipped 2
+Frames 620 | state 2 | mean tracking 12.7284ms | skipped 2
+Frames 640 | state 2 | mean tracking 12.9736ms | skipped 2
+Frames 660 | state 2 | mean tracking 13.254ms | skipped 2
+Frames 680 | state 2 | mean tracking 13.4224ms | skipped 2
+Fail to track local map!
+Relocalized!!
+Frames 700 | state 2 | mean tracking 13.542ms | skipped 2
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Relocalized!!
+Fail to track local map!
+Relocalized!!
+Frames 720 | state 2 | mean tracking 13.7074ms | skipped 2
+Frames 740 | state 2 | mean tracking 13.8841ms | skipped 2
+Frames 760 | state 2 | mean tracking 14.1364ms | skipped 2
+Frames 780 | state 2 | mean tracking 14.3838ms | skipped 2
+Frames 800 | state 2 | mean tracking 14.6047ms | skipped 2
+Frames 820 | state 2 | mean tracking 14.8271ms | skipped 2
+Frames 840 | state 2 | mean tracking 15.025ms | skipped 2
+Frames 860 | state 2 | mean tracking 15.1449ms | skipped 2
+Frames 880 | state 2 | mean tracking 15.2269ms | skipped 2
+Frames 900 | state 2 | mean tracking 15.3658ms | skipped 2
+Frames 920 | state 2 | mean tracking 15.5481ms | skipped 2
+Frames 940 | state 2 | mean tracking 15.7384ms | skipped 3
+Frames 960 | state 2 | mean tracking 15.9618ms | skipped 3
+Frames 980 | state 2 | mean tracking 16.1856ms | skipped 3
+Frames 1000 | state 2 | mean tracking 16.4451ms | skipped 3
+Frames 1020 | state 2 | mean tracking 16.5259ms | skipped 3
+Frames 1040 | state 2 | mean tracking 16.6313ms | skipped 3
+Frames 1060 | state 2 | mean tracking 16.6589ms | skipped 3
+Frames 1080 | state 2 | mean tracking 16.7033ms | skipped 3
+Frames 1100 | state 2 | mean tracking 16.8128ms | skipped 3
+Frames 1120 | state 2 | mean tracking 16.9005ms | skipped 3
+Frames 1140 | state 2 | mean tracking 16.9641ms | skipped 3
+TRACK_REF_KF: Less than 15 matches!!
+Fail to track local map!
+Fail to track local map!
+Fail to track local map!
+Relocalized!!
+Frames 1160 | state 2 | mean tracking 17.0951ms | skipped 3
+Frames 1180 | state 2 | mean tracking 17.2484ms | skipped 3
+Fail to track local map!
+Fail to track local map!
+Shutdown

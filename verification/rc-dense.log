@@ -1,0 +1,37 @@
+map_0: pair 1/12, 10291 fused surface voxels
+map_0: pair 2/12, 16562 fused surface voxels
+map_0: pair 3/12, 25106 fused surface voxels
+map_0: pair 4/12, 30855 fused surface voxels
+map_0: pair 5/12, 39603 fused surface voxels
+map_0: pair 6/12, 46388 fused surface voxels
+map_0: pair 7/12, 50359 fused surface voxels
+map_0: pair 8/12, 54279 fused surface voxels
+map_0: pair 9/12, 57365 fused surface voxels
+map_0: pair 10/12, 61174 fused surface voxels
+map_0: pair 11/12, 61174 fused surface voxels
+map_0: pair 12/12, 64045 fused surface voxels
+{
+  "metric_scale": false,
+  "flight_ready": false,
+  "vehicle_control": false,
+  "method": "calibrated multi-view SGBM, left-right consistency, voxel fusion",
+  "poses": "final optimized per-map poses",
+  "maps": [
+    {
+      "map": "map_0",
+      "attempted_pairs": 12,
+      "successful_pairs": 11,
+      "points": 19495,
+      "rejected": [
+        "Vertical epipolar pair is not supported by horizontal SGBM"
+      ],
+      "independent_coordinate_system": true,
+      "voxel_size_map_units": 0.00516815,
+      "capacity_dropped_samples": 0,
+      "min_pair_support": 2,
+      "candidate_voxels": 64045,
+      "file": "dense/map_0_dense.ply",
+      "reconstruction_seconds": 2.351223072000721
+    }
+  ]
+}

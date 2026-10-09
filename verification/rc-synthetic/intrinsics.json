@@ -1,0 +1,9 @@
+{
+  "camera": "PROCEDURAL TEST ONLY — never use on the physical Pi",
+  "validated": true,
+  "width": 640,
+  "height": 480,
+  "fps": 20,
+  "K": [[520.0, 0.0, 320.0], [0.0, 520.0, 240.0], [0.0, 0.0, 1.0]],
+  "distortion": [0.0, 0.0, 0.0, 0.0, 0.0]
+}
