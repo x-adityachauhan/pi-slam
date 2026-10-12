@@ -1,6 +1,8 @@
 # Pi camera SLAM on two laptops
 
 **Current target: manual RC-car testing with 3D surface reconstruction.**
+Start the CPU camera, tracker, depth worker and browser together with
+`bash /home/kali/pi-slam/slam.sh` (60 seconds by default; `--seconds 120` for two minutes).
 Use [rc/README.md](rc/README.md) and `bash rc/run.sh` on this laptop.
 The current reconstruction uses checked stereo pairs and depth agreement in
 three views; outputs go to `dense_v2/`. The saved-map viewer includes GPU depth

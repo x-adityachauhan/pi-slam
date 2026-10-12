@@ -3,7 +3,12 @@ set -euo pipefail
 PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 [[ -f "$PROJECT_DIR/calibration/camera.yaml" ]] || { printf 'Camera calibration missing.\n' >&2; exit 1; }
 mkdir -p "$PROJECT_DIR/runs"
-RUN_DIR="$(mktemp -d "$PROJECT_DIR/runs/rc-$(date +%Y%m%d-%H%M%S)-XXXXXX")"
+if [[ -n ${CPU_SESSION_DIR:-} ]]; then
+    RUN_DIR="$CPU_SESSION_DIR"
+    [[ -d "$RUN_DIR" && ! -e "$RUN_DIR/camera.yaml" && ! -e "$RUN_DIR/poses_live.tum" ]] || { echo 'Session directory is not fresh.' >&2; exit 2; }
+else
+    RUN_DIR="$(mktemp -d "$PROJECT_DIR/runs/rc-$(date +%Y%m%d-%H%M%S)-XXXXXX")"
+fi
 cp -- "$PROJECT_DIR/calibration/camera.yaml" "$RUN_DIR/camera.yaml"
 bash "$PROJECT_DIR/run-python.sh" rc/cpu_settings.py "$PROJECT_DIR/calibration/camera.yaml" "$RUN_DIR/camera.yaml" --profile candidate
 cp -- "$PROJECT_DIR/calibration/intrinsics.json" "$RUN_DIR/intrinsics.json"
@@ -12,7 +17,9 @@ cd "$RUN_DIR"
 export LD_LIBRARY_PATH="$PROJECT_DIR/env/lib:$PROJECT_DIR/vendor/ORB_SLAM3/lib:$PROJECT_DIR/vendor/ORB_SLAM3/Thirdparty/DBoW2/lib:$PROJECT_DIR/vendor/ORB_SLAM3/Thirdparty/g2o/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=xcb PANGOLIN_WINDOW_URI='x11://' OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2
 printf 'RC-car research run: %s\nRelative scale; no steering or flight-controller output.\n' "$RUN_DIR"
-printf 'Live browser: bash run-python.sh rc/live_view.py %q --port 8093\n' "$RUN_DIR"
+if [[ -z ${CPU_SESSION_DIR:-} ]]; then
+    printf 'Live browser: bash run-python.sh rc/live_view.py %q --port 8093\n' "$RUN_DIR"
+fi
 trap ':' INT
 TRACKER_STATUS=0
 "$PROJECT_DIR/build/pi_slam_live" "$PROJECT_DIR/vendor/ORB_SLAM3/Vocabulary/ORBvoc.txt" \

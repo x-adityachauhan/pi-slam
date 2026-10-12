@@ -2,6 +2,29 @@
 
 ## Updated CPU live workflow
 
+### One command (recommended)
+
+```bash
+bash /home/kali/pi-slam/slam.sh
+```
+
+Enter the Pi SSH password once when prompted. This starts the camera, a
+60-second CPU SLAM recording, the depth worker and the live browser together.
+The printed URL defaults to 8093, with an automatic alternative if that port
+is occupied. Q in the camera window stops capture early; Ctrl+C requests a
+graceful stop. After recording and reconstruction finish, the camera/depth
+processes stop and the browser retains the last snapshot with a stale label.
+Press Ctrl+C then to close the remaining browser server. Files stay in runs/.
+
+Options: `--seconds 120` for two minutes, `--no-depth` for sparse tracking only,
+`--exit-after-test` to close all services at completion. Existing camera tunnels
+on port 8765 must be stopped first; the launcher never kills unrelated services.
+The Pi helper must already be deployed (it is on this Pi). For a fresh Pi,
+deploy with `bash rc/start-camera.sh --deploy`, then stop that camera session
+before using the one-command launcher. No password is stored.
+
+### Individual components
+
 Use `bash rc/start-camera.sh --deploy` for the opt-in CPU camera profile
 (10 ms requested exposure, auto ISO, JPEG quality 75). Keep the scene bright.
 Run `bash rc/run.sh` in another terminal. It prints the unique run directory
