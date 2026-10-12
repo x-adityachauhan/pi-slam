@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pi camera · 3D mapping</title>
+<link rel="icon" href="data:,">
+<style>
+body{margin:0;background:#111722;color:#e4eaf1;font:15px system-ui,sans-serif}
+header{padding:20px 24px;border-bottom:1px solid #293449}h1{font-size:23px;margin:0 0 8px}
+#status{color:#a4d4be}main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;padding:24px}
+.panel{background:#192230;border:1px solid #293449;border-radius:10px;overflow:hidden}
+h2{font-size:15px;padding:12px 16px;margin:0}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 16px 12px}
+img{width:100%;display:block;min-height:200px}canvas{display:block;width:100%;height:560px;touch-action:none}
+footer{padding:12px 16px;color:#a8b5c8;font-size:13px;line-height:1.6}
+button,select,a.download{background:#293b52;border:1px solid #42536a;color:white;border-radius:4px;padding:7px 10px;cursor:pointer;text-decoration:none;font:inherit;font-size:13px}
+button.active{border-color:#72d1ae;background:#21483f}label{font-size:12px;color:#bbc8d8}
+#point-size{width:70px;vertical-align:middle}#notice{padding:0 24px 20px;color:#a8b5c8;font-size:13px}
+#error{color:#ffbcad;padding:12px;display:none}@media(max-width:850px){main{grid-template-columns:1fr}canvas{height:420px}}
+</style>
+</head>
+<body>
+<header><h1 id="title">Pi camera · 3D mapping</h1><div id="status">Loading camera and map…</div></header>
+<main>
+<section class="panel"><h2 id="camera-label">Camera image</h2><img id="camera" alt="Pi camera reference view"><footer id="stats">Loading capture</footer></section>
+<section class="panel"><h2 id="map-label">3D reconstruction</h2>
+<div class="toolbar">
+<select id="maps" aria-label="Independent map" hidden></select>
+<button id="camera-view">Camera view</button><button id="reset">Orbit / fit map</button>
+<label><input id="surfaces" type="checkbox" checked> Surfaces</label>
+<label>Point size <input id="point-size" type="range" min="1" max="5" step=".25" value="2.5"></label>
+<label><input id="path" type="checkbox" checked> Camera path</label>
+<a id="download" class="download" hidden>Download PLY</a>
+</div><div id="error"></div><canvas id="map" aria-label="Interactive three dimensional reconstruction"></canvas>
+<footer id="legend">Drag to orbit · scroll to zoom · depth-tested colored points.</footer></section>
+</main><section class="panel" style="margin:24px"><h2>Map X–Z projection · not gravity-aligned</h2><canvas id="topdown" style="height:300px"></canvas><footer>Relative units. Empty space is unknown, not verified free space.</footer></section><div id="notice"></div>
+<script src="/viewer.js"></script>
+</body></html>

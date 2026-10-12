@@ -12,10 +12,11 @@ cd "$RUN_DIR"
 export LD_LIBRARY_PATH="$PROJECT_DIR/env/lib:$PROJECT_DIR/vendor/ORB_SLAM3/lib:$PROJECT_DIR/vendor/ORB_SLAM3/Thirdparty/DBoW2/lib:$PROJECT_DIR/vendor/ORB_SLAM3/Thirdparty/g2o/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=xcb PANGOLIN_WINDOW_URI='x11://' OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2
 printf 'RC-car research run: %s\nRelative scale; no steering or flight-controller output.\n' "$RUN_DIR"
+printf 'Live browser: bash run-python.sh rc/live_view.py %q --port 8093\n' "$RUN_DIR"
 trap ':' INT
 TRACKER_STATUS=0
 "$PROJECT_DIR/build/pi_slam_live" "$PROJECT_DIR/vendor/ORB_SLAM3/Vocabulary/ORBvoc.txt" \
-    "$RUN_DIR/camera.yaml" "$RUN_DIR" --record-frames --pose-events --max-frames 3000 "$@" || TRACKER_STATUS=$?
+    "$RUN_DIR/camera.yaml" "$RUN_DIR" --record-frames --pose-events --live-web --max-frames 3000 "$@" || TRACKER_STATUS=$?
 trap - INT
 if (( TRACKER_STATUS != 0 && TRACKER_STATUS != 3 )); then
     printf 'Tracker failed (status %s). Recording retained: %s\n' "$TRACKER_STATUS" "$RUN_DIR" >&2

@@ -227,6 +227,7 @@ int main(int argc, char** argv) {
     bool viewer = true;
     bool pose_events = false;
     bool record_frames = false;
+    bool live_web = false;
     size_t max_frames = 0;
     double seconds = 0;
     int port = 8765;
@@ -234,6 +235,7 @@ int main(int argc, char** argv) {
         if (std::string(argv[i]) == "--headless") viewer = false;
         else if (std::string(argv[i]) == "--pose-events") pose_events = true;
         else if (std::string(argv[i]) == "--record-frames") record_frames = true;
+        else if (std::string(argv[i]) == "--live-web") live_web = true;
         else if (std::string(argv[i]) == "--max-frames" && i+1<argc) max_frames = std::stoull(argv[++i]);
         else if (std::string(argv[i]) == "--seconds" && i+1<argc) seconds = std::stod(argv[++i]);
         else if (std::string(argv[i]) == "--port" && i+1<argc) port = std::stoi(argv[++i]);
@@ -249,6 +251,10 @@ int main(int argc, char** argv) {
         if (!settings.isOpened() || int(settings["Calibration.validated"]) != 1)
             throw std::runtime_error("Validated calibration is required: run calibrate.py first");
         int width = settings["Camera.width"], height = settings["Camera.height"];
+        cv::Mat K = (cv::Mat_<double>(3,3) << double(settings["Camera1.fx"]),0,double(settings["Camera1.cx"]),
+            0,double(settings["Camera1.fy"]),double(settings["Camera1.cy"]),0,0,1);
+        cv::Mat distortion = (cv::Mat_<double>(1,5) << double(settings["Camera1.k1"]),double(settings["Camera1.k2"]),
+            double(settings["Camera1.p1"]),double(settings["Camera1.p2"]),double(settings["Camera1.k3"]));
         settings.release();
         fs::create_directories(output);
         if (fs::exists(output / "poses_live.tum")) throw std::runtime_error("Output directory already contains a run");
@@ -273,6 +279,7 @@ int main(int argc, char** argv) {
         uint64_t feature_total = 0;
         bool stream_failed = false;
         double last_init_warning = -10;
+        uint64_t last_web = 0;
         auto start = std::chrono::steady_clock::now();
         while (!interrupted && !slam->ViewerFinished() && (!max_frames || processed < max_frames) &&
                (!seconds || std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count() < seconds)) {
@@ -328,8 +335,18 @@ int main(int argc, char** argv) {
                 << " | mean tracking " << total_ms/processed << "ms | skipped " << dropped
                 << " | tracked " << 100.0*tracked/processed << "% | features " << features
                 << " | maps " << slam->GetAtlasForExport()->GetAllMaps().size() << std::endl;
-            if (viewer) {
-                cv::Mat display = frame.image.clone();
+            const auto now_ns = monotonic_ns();
+            const bool publish = live_web && now_ns-last_web > 250000000ULL;
+            if (viewer || publish) {
+                cv::Mat display;
+                cv::undistort(frame.image, display, K, distortion);
+                auto keys = slam->GetTrackedKeyPointsUn();
+                auto matches = slam->GetTrackedMapPoints();
+                for (size_t i=0;i<keys.size();++i) {
+                    bool matched = state == 2 && i<matches.size() && matches[i] && !matches[i]->isBad() && matches[i]->Observations()>0;
+                    cv::circle(display, keys[i].pt, matched ? 3 : 1,
+                               matched ? cv::Scalar(60,240,60) : cv::Scalar(0,160,255), 1);
+                }
                 std::string status = state == 2 ? "TRACKING" : state == 1 ? "MOVE CAMERA SIDEWAYS" : "TRACKING LOST";
                 cv::putText(display, status + " | Q: save and quit", cv::Point(10,25),
                             cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0,255,0), 2);
@@ -341,9 +358,58 @@ int main(int argc, char** argv) {
                 cv::putText(display, "Features: " + std::to_string(features) +
                             (features <= 100 ? " | Too little usable texture" : " | Geometry must also agree"),
                             cv::Point(10,72), cv::FONT_HERSHEY_SIMPLEX, 0.45, cv::Scalar(0,220,255), 1);
-                cv::imshow("Pi camera - ORB-SLAM3", display);
-                int key = cv::waitKey(1) & 0xFF;
-                if (key == 27 || key == 'q') break;
+                const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
+                cv::putText(display, "FPS " + std::to_string(int(processed/std::max(elapsed,.001))) +
+                    " | tracked " + std::to_string(int(100.0*tracked/processed)) + "% | green: matched / orange: other",
+                    cv::Point(10,94),cv::FONT_HERSHEY_SIMPLEX,.4,cv::Scalar(255,255,255),1);
+                if (publish) {
+                    last_web = now_ns;
+                    auto* map = slam->GetAtlasForExport()->GetCurrentMap();
+                    std::unique_lock<std::mutex> map_lock(map->mMutexMapUpdate, std::try_to_lock);
+                    if (map_lock.owns_lock()) {
+                        std::ostringstream json;
+                        json << "{\"saved\":false,\"metric_scale\":false,\"sequence\":" << frame.sequence
+                             << ",\"updated_ns\":" << now_ns << ",\"map_id\":" << map->GetId()
+                             << ",\"map_count\":" << slam->GetAtlasForExport()->GetAllMaps().size()
+                             << ",\"frames\":" << processed << ",\"skipped\":" << dropped
+                             << ",\"fps\":" << processed/std::max(elapsed,.001)
+                             << ",\"tracked_pct\":" << 100.0*tracked/processed
+                             << ",\"keypoints\":" << features << ",\"mean_ms\":" << total_ms/processed
+                             << ",\"tracking_state\":" << state << ",\"status\":\"" << status
+                             << " | relative scale | map " << map->GetId() << "\",\"points\":[";
+                        size_t count = 0;
+                        for (auto* p : map->GetAllMapPoints()) {
+                            if (!p || p->isBad() || p->Observations()<3) continue;
+                            const auto xyz = p->GetWorldPos();
+                            if (!xyz.allFinite()) continue;
+                            if (count++) json << ',';
+                            json << '[' << xyz.x() << ',' << xyz.y() << ',' << xyz.z() << ']';
+                            if (count>=20000) break;
+                        }
+                        json << "],\"trajectory\":[";
+                        auto kfs = map->GetAllKeyFrames();
+                        std::sort(kfs.begin(),kfs.end(),[](auto* a, auto* b){return a->mTimeStamp<b->mTimeStamp;});
+                        count = 0;
+                        for (auto* kf : kfs) {
+                            if (kf->isBad()) continue;
+                            const auto xyz = kf->GetPoseInverse().translation();
+                            if (!xyz.allFinite()) continue;
+                            if (count++) json << ',';
+                            json << '[' << xyz.x() << ',' << xyz.y() << ',' << xyz.z() << ']';
+                        }
+                        json << "]}";
+                        map_lock.unlock();
+                        cv::imwrite((output/"live_frame.tmp.jpg").string(),display,{cv::IMWRITE_JPEG_QUALITY,75});
+                        fs::rename(output/"live_frame.tmp.jpg",output/"live_frame.jpg");
+                        {std::ofstream file(output/"live_map.tmp.json");file << json.str();}
+                        fs::rename(output/"live_map.tmp.json",output/"live_map.json");
+                    }
+                }
+                if (viewer) {
+                    cv::imshow("Pi camera - ORB-SLAM3", display);
+                    int key = cv::waitKey(1) & 0xFF;
+                    if (key == 27 || key == 'q') break;
+                }
             }
         }
         const auto capture_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
