@@ -1,5 +1,37 @@
 # RC-car camera-only 3D SLAM
 
+## Updated CPU live workflow
+
+Use `bash rc/start-camera.sh --deploy` for the opt-in CPU camera profile
+(10 ms requested exposure, auto ISO, JPEG quality 75). Keep the scene bright.
+Run `bash rc/run.sh` in another terminal. It prints the unique run directory
+and a `rc/live_view.py` command; run that command for the CPU browser on 8093.
+The camera has green mapped-feature and orange other-feature overlays, state
+and delivered FPS. These are feature detections, not semantic object labels.
+The CPU browser includes live trajectory, sparse landmarks and an X-Z view.
+X-Z is not gravity-aligned without a mounting assumption or external sensor.
+
+Optional learned depth (experimental, CPU only):
+
+```bash
+bash rc/setup-depth.sh
+bash run-python.sh rc/depth_worker.py runs/YOUR_CURRENT_RUN
+```
+
+Enable **Predicted TSDF** in the CPU browser. Inference runs in a worker thread
+in a separate, lower-priority process with two inference threads. The latest
+16 keyframes are the bounded input set; superseded snapshots are skipped.
+Inverse-depth scale and offset are fitted to SLAM anchors with held-out checks.
+Rejected predictions are not fused. An 80-cubed local TSDF is rebuilt from
+current poses each update; it is not a persistent whole-building mesh. The
+range panel bins predicted surfaces in map X-Z, not actual LiDAR measurements.
+Scale is arbitrary. Missing bins/voxels are unknown, never safe free space.
+Older dense publications are hidden after five seconds or map changes.
+
+Source: [MiDaS](https://github.com/isl-org/MiDaS), MIT-licensed model repository.
+Model binaries remain local and ignored by Git. No GPU/DPV entrypoint or viewer
+was changed. See verification/CPU_LIVE_DIAGNOSIS.md and CPU_STEP2/3/4.md.
+
 This is the current target. Drone navigation is deferred. The Pi captures
 its calibrated camera; a laptop tracks motion, closes loops and saves a sparse
 3D map. **After you stop**, calibrated multi-view stereo reconstructs richer,

@@ -22,6 +22,13 @@ def make_server(run, port):
                         state["stale"] = age > 3
                         if state["stale"]:
                             state["status"] = "STOPPED / STALE · last live snapshot · relative scale"
+                        state.pop("keyframes", None)
+                        try:
+                            dense = json.loads((run/"dense_live.json").read_text())
+                            if dense["map_id"] == state["map_id"] and abs(dense["source_updated_ns"]-state["updated_ns"]) < 5_000_000_000:
+                                state["dense"] = dense
+                        except (OSError, ValueError, KeyError):
+                            pass
                     except FileNotFoundError:
                         state = {"points": [], "trajectory": [], "saved": False,
                                  "status": "Waiting for this CPU run to publish frames", "stale": True}

@@ -314,6 +314,7 @@ int main(int argc, char** argv) {
                 image_file.write(reinterpret_cast<const char*>(frame.jpeg.data()), frame.jpeg.size());
                 if (!image_file) throw std::runtime_error("Cannot record camera image (disk full?)");
                 frame_index << timestamp << ',' << frame.timestamp << ',' << frame.sequence << ',' << name << '\n';
+                frame_index.flush();
                 if (!frame_index) throw std::runtime_error("Cannot record frame index");
             }
             auto before = std::chrono::steady_clock::now();
@@ -396,6 +397,30 @@ int main(int argc, char** argv) {
                             if (!xyz.allFinite()) continue;
                             if (count++) json << ',';
                             json << '[' << xyz.x() << ',' << xyz.y() << ',' << xyz.z() << ']';
+                        }
+                        json << "],\"keyframes\":[";
+                        count = 0;
+                        for (size_t j=kfs.size()>16?kfs.size()-16:0;j<kfs.size();++j) {
+                            auto* kf=kfs[j];
+                            if(kf->isBad()) continue;
+                            const auto T=kf->GetPoseInverse().matrix();
+                            if(!T.allFinite()) continue;
+                            if(count++) json << ',';
+                            json << "{\"id\":" << kf->mnId << ",\"time\":" << std::setprecision(12) << kf->mTimeStamp
+                                 << ",\"T\":[";
+                            for(int r=0;r<4;++r){if(r)json<<',';json<<'[';for(int c=0;c<4;++c){if(c)json<<',';json<<T(r,c);}json<<']';}
+                            json << "],\"observations\":[";
+                            const auto points=kf->GetMapPointMatches();size_t observations=0;
+                            const auto Tcw=kf->GetPose();
+                            for(size_t i=0;i<points.size() && i<kf->mvKeysUn.size();++i){
+                                auto* p=points[i];if(!p || p->isBad() || p->Observations()<3)continue;
+                                const auto xyz=Tcw*p->GetWorldPos();
+                                if(!xyz.allFinite() || xyz.z()<=0)continue;
+                                if(observations++)json<<',';
+                                json<<'['<<kf->mvKeysUn[i].pt.x<<','<<kf->mvKeysUn[i].pt.y<<','<<xyz.z()<<']';
+                                if(observations>=400)break;
+                            }
+                            json << "]}";
                         }
                         json << "]}";
                         map_lock.unlock();

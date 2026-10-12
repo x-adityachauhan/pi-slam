@@ -7,6 +7,16 @@ let yaw = 0, pitch = 0, zoom = 1, drag = null, cameraMode = true, requestSerial 
 const I = () => [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
 const mul = (a,b) => a.map(row => b[0].map((_,j) => row.reduce((v,x,k) => v+x*b[k][j],0)));
 let program, locations;
+let latest=null;
+function chooseGeometry(){
+  if(!latest)return;
+  state={...latest};
+  if($("#predicted").checked && latest.dense?.faces?.length){
+    state.points=latest.dense.points;state.faces=latest.dense.faces;
+    state.colors=state.points.map(()=>[180,170,115]);
+  }
+  upload();draw();
+}
 function error(message) { $("#error").textContent=message; $("#error").style.display="block"; }
 function shader(type, source) {
   const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);
@@ -101,6 +111,18 @@ function draw() {
   for(const p of state.points){const [x,y]=xy(p);ctx.fillRect(x,y,2,2);}
   ctx.strokeStyle="#ffc477";ctx.beginPath();
   state.trajectory.forEach((p,i)=>{const [x,y]=xy(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  const range=$("#range"),rc=range.getContext("2d");range.width=range.clientWidth;range.height=260;
+  rc.fillStyle="#101722";rc.fillRect(0,0,range.width,260);
+  const origin=state.trajectory.at(-1),bins=Array.from({length:180},()=>[]);
+  if(origin)for(const p of latest?.dense?.points||[]){
+    const x=p[0]-origin[0],z=p[2]-origin[2],r=Math.hypot(x,z);
+    const i=Math.min(179,Math.floor((Math.atan2(x,z)+Math.PI)/(2*Math.PI)*180));bins[i].push(r);
+  }
+  const ranges=bins.map(v=>v.length>=2?Math.min(...v):null),max=Math.max(.001,...ranges.filter(v=>v!==null));
+  rc.strokeStyle="#42536a";rc.beginPath();rc.arc(range.width/2,130,110,0,2*Math.PI);rc.stroke();
+  rc.fillStyle="#d8c489";
+  ranges.forEach((r,i)=>{if(r===null)return;const a=(i+.5)/180*2*Math.PI-Math.PI;rc.fillRect(range.width/2+110*r/max*Math.sin(a),130-110*r/max*Math.cos(a),3,3);});
+  rc.fillStyle="#bbc8d8";rc.fillText(origin&&latest?.dense?"Outer ring: "+max.toFixed(3)+" relative units":"Waiting for supported predicted surfaces",10,20);
 }
 async function refresh(mapId) {
   const serial=++requestSerial;
@@ -110,7 +132,7 @@ async function refresh(mapId) {
     if(!response.ok)throw Error("Map is unavailable");
     const next=await response.json();if(serial!==requestSerial)return;
     const first=!state.points.length||state.map_id!==next.map_id;
-    state=next;upload();if(first){fit();cameraMode=!!state.reference;}
+    latest=next;state=next;chooseGeometry();if(first){fit();cameraMode=!!state.reference;}
     $("#error").style.display="none";
     $("#status").textContent=state.status;
     $("#title").textContent=state.saved?"Pi camera · saved 3D reconstruction":"Pi camera · live SLAM";
@@ -125,7 +147,7 @@ async function refresh(mapId) {
     $("#download").hidden=!state.saved||!state.maps;
     $("#download").href="/download?map="+encodeURIComponent(state.map_id||"");
     $("#download").download=(state.map_id||"map")+".ply";
-    $("#notice").textContent=state.saved?"Each map has its own coordinate frame. Missing surfaces remain empty; scale is relative. "+(state.method||""):"";
+    $("#notice").textContent=state.saved?"Each map has its own coordinate frame. Missing surfaces remain empty; scale is relative. "+(state.method||""):(latest.dense?latest.dense.label+" · "+latest.dense.accepted_keyframes+" accepted keyframes · "+latest.dense.faces.length+" triangles":"Sparse SLAM only. Predicted depth unavailable or stale.");
     draw();
     // Saved maps are immutable: do not repeatedly transfer and parse a large cloud.
     if(!state.saved)setTimeout(()=>refresh(),250);
@@ -139,5 +161,6 @@ $("#reset").onclick=()=>{cameraMode=false;fit();draw();};
 $("#camera-view").onclick=()=>{cameraMode=!!state.reference;zoom=1;draw();};
 $("#maps").onchange=e=>refresh(e.target.value);
 $("#point-size").oninput=$("#path").onchange=$("#surfaces").onchange=draw;
+$("#predicted").onchange=()=>{chooseGeometry();fit();draw();};
 window.onresize=draw;
 try{initialize();refresh();}catch(e){error(e.message);}

@@ -27,11 +27,12 @@ button.active{border-color:#72d1ae;background:#21483f}label{font-size:12px;color
 <select id="maps" aria-label="Independent map" hidden></select>
 <button id="camera-view">Camera view</button><button id="reset">Orbit / fit map</button>
 <label><input id="surfaces" type="checkbox" checked> Surfaces</label>
+<label><input id="predicted" type="checkbox"> Predicted TSDF (experimental)</label>
 <label>Point size <input id="point-size" type="range" min="1" max="5" step=".25" value="2.5"></label>
 <label><input id="path" type="checkbox" checked> Camera path</label>
 <a id="download" class="download" hidden>Download PLY</a>
 </div><div id="error"></div><canvas id="map" aria-label="Interactive three dimensional reconstruction"></canvas>
 <footer id="legend">Drag to orbit · scroll to zoom · depth-tested colored points.</footer></section>
-</main><section class="panel" style="margin:24px"><h2>Map X–Z projection · not gravity-aligned</h2><canvas id="topdown" style="height:300px"></canvas><footer>Relative units. Empty space is unknown, not verified free space.</footer></section><div id="notice"></div>
+</main><section class="panel" style="margin:24px"><h2>Map X–Z projection · not gravity-aligned</h2><canvas id="topdown" style="height:300px"></canvas><footer>Relative units. Empty space is unknown, not verified free space.</footer></section><section class="panel" style="margin:24px"><h2>Projected range bins · not measured LiDAR · map X–Z axes</h2><canvas id="range" style="height:260px"></canvas><footer>Nearest supported predicted surface per angular bin, relative units. No return means unknown.</footer></section><div id="notice"></div>
 <script src="/viewer.js"></script>
 </body></html>
