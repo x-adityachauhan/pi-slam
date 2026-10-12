@@ -88,7 +88,7 @@ def candidate_pairs(views, depth):
                 yield i, j
 
 
-def reconstruct(run, calibration_path, max_pairs=40, voxel_size=None, disparities=128, min_support=2):
+def reconstruct_pairwise(run, calibration_path, max_pairs=40, voxel_size=None, disparities=128, min_support=2):
     if max_pairs < 1 or min_support < 1:
         raise ValueError("Positive pair count and support threshold required")
     calibration = json.loads(calibration_path.read_text())
@@ -159,6 +159,17 @@ def reconstruct(run, calibration_path, max_pairs=40, voxel_size=None, disparitie
     return report
 
 
+def reconstruct(run, calibration_path, max_pairs=40, voxel_size=None, disparities=128,
+                min_support=2, method="multiview", output_name="dense_v2"):
+    if method == "pairwise":
+        return reconstruct_pairwise(run, calibration_path, max_pairs, voxel_size, disparities, min_support)
+    if method != "multiview":
+        raise ValueError("Unknown reconstruction method")
+    from rc.multiview import reconstruct_multiview
+    return reconstruct_multiview(run, calibration_path, max_pairs, voxel_size,
+                                 disparities, min_support, output_name)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run", type=Path)
@@ -166,13 +177,18 @@ def main():
     parser.add_argument("--max-pairs", type=int, default=40)
     parser.add_argument("--voxel-size", type=float)
     parser.add_argument("--disparities", type=int, default=128)
-    parser.add_argument("--min-support", type=int, default=2, help="Minimum different image pairs supporting a surface voxel")
+    parser.add_argument("--min-support", type=int, default=2, help="Minimum other views agreeing with each depth pixel (multiview)")
+    parser.add_argument("--method", choices=("multiview", "pairwise"), default="multiview")
+    parser.add_argument("--output-name", default="dense_v2", help="Multiview output subdirectory; preserves the earlier dense output")
+    parser.add_argument("--threads", type=int, default=2, help="OpenCV CPU thread budget")
     args = parser.parse_args()
-    if args.max_pairs < 1 or args.min_support < 1:
-        parser.error("--max-pairs and --min-support must be positive")
+    if args.max_pairs < 1 or args.min_support < 1 or args.threads < 1:
+        parser.error("Pair, support and thread counts must be positive")
+    cv2.setNumThreads(args.threads)
     try:
         print(json.dumps(reconstruct(args.run, args.calibration, args.max_pairs,
-                                     args.voxel_size, args.disparities, args.min_support), indent=2))
+                                     args.voxel_size, args.disparities, args.min_support,
+                                     args.method, args.output_name), indent=2))
     except (ValueError, OSError) as exc:
         raise SystemExit(str(exc))
 

@@ -185,7 +185,9 @@ def main():
                     continue
                 with client:
                     client.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                    client.settimeout(2)
+                    # Bounded Wi-Fi stall tolerance. Capture continues separately,
+                    # and the next transmission uses the newest available frame.
+                    client.settimeout(10)
                     previous = -1
                     try:
                         while True:
@@ -202,8 +204,8 @@ def main():
                                                  len(jpeg), camera.width, camera.height, flags)
                             client.sendall(header + jpeg)
                             previous = sequence
-                    except (BrokenPipeError, ConnectionResetError, socket.timeout):
-                        pass
+                    except (BrokenPipeError, ConnectionResetError, socket.timeout) as exc:
+                        print(f"Client disconnected: {type(exc).__name__}: {exc}; awaiting reconnect", flush=True)
             if errors:
                 raise errors[0]
     finally:

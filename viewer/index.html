@@ -1,18 +1,37 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pi camera · live SLAM</title>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pi camera · 3D mapping</title>
+<link rel="icon" href="data:,">
 <style>
-body{margin:0;background:#111722;color:#e4eaf1;font:15px system-ui,sans-serif}header{padding:20px 24px;border-bottom:1px solid #293449}h1{font-size:23px;margin:0 0 8px}#status{color:#a4d4be}main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;padding:24px}.panel{background:#192230;border:1px solid #293449;border-radius:10px;overflow:hidden}h2{font-size:15px;padding:12px 16px;margin:0}img{width:100%;display:block;min-height:200px}canvas{display:block;width:100%;height:500px;touch-action:none}footer{padding:12px 16px;color:#a8b5c8;font-size:13px}button{background:#293b52;border:0;color:white;border-radius:4px;padding:7px 12px;cursor:pointer}@media(max-width:850px){main{grid-template-columns:1fr}}
+body{margin:0;background:#111722;color:#e4eaf1;font:15px system-ui,sans-serif}
+header{padding:20px 24px;border-bottom:1px solid #293449}h1{font-size:23px;margin:0 0 8px}
+#status{color:#a4d4be}main{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;padding:24px}
+.panel{background:#192230;border:1px solid #293449;border-radius:10px;overflow:hidden}
+h2{font-size:15px;padding:12px 16px;margin:0}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 16px 12px}
+img{width:100%;display:block;min-height:200px}canvas{display:block;width:100%;height:560px;touch-action:none}
+footer{padding:12px 16px;color:#a8b5c8;font-size:13px;line-height:1.6}
+button,select,a.download{background:#293b52;border:1px solid #42536a;color:white;border-radius:4px;padding:7px 10px;cursor:pointer;text-decoration:none;font:inherit;font-size:13px}
+button.active{border-color:#72d1ae;background:#21483f}label{font-size:12px;color:#bbc8d8}
+#point-size{width:70px;vertical-align:middle}#notice{padding:0 24px 20px;color:#a8b5c8;font-size:13px}
+#error{color:#ffbcad;padding:12px;display:none}@media(max-width:850px){main{grid-template-columns:1fr}canvas{height:420px}}
 </style>
-<header><h1>Pi camera · live SLAM</h1><div id="status">Waiting for camera and map…</div></header>
-<main><section class="panel"><h2 id="camera-label">Live camera</h2><img id="camera" alt="Pi camera view"><footer id="stats">Waiting for capture</footer></section>
-<section class="panel"><h2><span id="map-label">Sparse 3D map</span> <button id="reset">Fit map</button></h2><canvas id="map"></canvas><footer id="legend">Drag to rotate · scroll to zoom · cyan: landmarks · amber: camera path. Scale is relative, not metres.</footer></section></main>
-<script>
-const canvas=document.querySelector('#map'),ctx=canvas.getContext('2d');
-let state={points:[],trajectory:[]},yaw=.35,pitch=.3,zoom=1,drag=null,center=[0,0,0],extent=1;
-function fit(){const points=state.points.length?state.points:state.trajectory;if(!points.length)return;const axes=[0,1,2].map(i=>points.map(p=>p[i]).sort((a,b)=>a-b));const lo=axes.map(a=>a[Math.floor(a.length*.05)]),hi=axes.map(a=>a[Math.min(a.length-1,Math.floor(a.length*.95))]);center=lo.map((v,i)=>(v+hi[i])/2);extent=Math.max(...hi.map((v,i)=>v-lo[i]),.01);zoom=1;}
-function project(p){let [x,y,z]=p.map((v,i)=>v-center[i]);let a=x*Math.cos(yaw)-z*Math.sin(yaw),b=x*Math.sin(yaw)+z*Math.cos(yaw),c=y*Math.cos(pitch)-b*Math.sin(pitch);const scale=Math.min(canvas.width,canvas.height)*.7*zoom/extent;return[canvas.width/2+a*scale,canvas.height/2+c*scale];}
-function draw(){const ratio=devicePixelRatio||1;canvas.width=Math.round(canvas.clientWidth*ratio);canvas.height=Math.round(canvas.clientHeight*ratio);ctx.fillStyle='#131c29';ctx.fillRect(0,0,canvas.width,canvas.height);for(let i=0;i<state.points.length;i++){const[x,y]=project(state.points[i]);ctx.fillStyle=state.colors?.[i]?`rgb(${state.colors[i].join(',')})`:'#65d6cd';ctx.fillRect(x,y,2*ratio,2*ratio);}ctx.beginPath();for(let i=0;i<state.trajectory.length;i++){const[x,y]=project(state.trajectory[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle='#ffc573';ctx.lineWidth=2*ratio;ctx.stroke();if(state.trajectory.length){const[x,y]=project(state.trajectory.at(-1));ctx.beginPath();ctx.arc(x,y,5*ratio,0,2*Math.PI);ctx.fillStyle='#fff1cc';ctx.fill();}}
-canvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!drag)return;yaw+=(e.clientX-drag[0])*.008;pitch+=(e.clientY-drag[1])*.008;drag=[e.clientX,e.clientY];draw()};canvas.onpointerup=()=>drag=null;canvas.onwheel=e=>{e.preventDefault();zoom=Math.max(.05,Math.min(30,zoom*Math.exp(-e.deltaY*.001)));draw()};document.querySelector('#reset').onclick=()=>{fit();draw()};window.onresize=draw;
-async function refresh(){try{const response=await fetch('/api',{cache:'no-store'});if(!response.ok)throw Error();const next=await response.json();const first=!state.points.length&&next.points.length;state=next;if(first)fit();document.querySelector('#status').textContent=state.status;document.querySelector('#stats').textContent=state.saved?`${state.total_points} reconstructed surface points · showing ${state.points.length} · last recorded image`:state.frames?`${state.frames} processed frames · ${state.skipped} skipped · ${state.mean_ms} ms/frame`:'Waiting for capture';if(state.saved){document.querySelector('#camera-label').textContent='Last recorded camera image';document.querySelector('#map-label').textContent='Reconstructed 3D surfaces';document.querySelector('#legend').textContent='Drag to rotate · scroll to zoom · colored: reconstructed surfaces · amber: camera path. Relative scale, not metres.';}document.querySelector('#camera').src='/frame.jpg?t='+Date.now();draw()}catch{document.querySelector('#status').textContent='Session stopped or connection unavailable'}setTimeout(refresh,500)}refresh();
-</script></html>
+</head>
+<body>
+<header><h1 id="title">Pi camera · 3D mapping</h1><div id="status">Loading camera and map…</div></header>
+<main>
+<section class="panel"><h2 id="camera-label">Camera image</h2><img id="camera" alt="Pi camera reference view"><footer id="stats">Loading capture</footer></section>
+<section class="panel"><h2 id="map-label">3D reconstruction</h2>
+<div class="toolbar">
+<select id="maps" aria-label="Independent map" hidden></select>
+<button id="camera-view">Camera view</button><button id="reset">Orbit / fit map</button>
+<label><input id="surfaces" type="checkbox" checked> Surfaces</label>
+<label>Point size <input id="point-size" type="range" min="1" max="5" step=".25" value="2.5"></label>
+<label><input id="path" type="checkbox"> Camera path</label>
+<a id="download" class="download" hidden>Download PLY</a>
+</div><div id="error"></div><canvas id="map" aria-label="Interactive three dimensional reconstruction"></canvas>
+<footer id="legend">Drag to orbit · scroll to zoom · depth-tested colored points.</footer></section>
+</main><div id="notice"></div>
+<script src="/viewer.js"></script>
+</body></html>

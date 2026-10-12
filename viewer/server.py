@@ -1,6 +1,7 @@
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlsplit, parse_qs
 
 
 def make_server(state, port=8090):
@@ -8,17 +9,31 @@ def make_server(state, port=8090):
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
-            route = self.path.split("?", 1)[0]
+            url = urlsplit(self.path)
+            route = url.path
+            selected = parse_qs(url.query).get("map", [state.get("default_map")])[0]
+            if route in ("/api", "/frame.jpg", "/download") and "load_map" in state:
+                try:
+                    selected_map, selected_jpeg = state["load_map"](selected)
+                except (ValueError, OSError):
+                    self.send_error(404, "Unknown or unavailable map")
+                    return
+            else:
+                selected_map, selected_jpeg = None, None
             if route == "/":
                 body, mime = page, "text/html; charset=utf-8"
+            elif route == "/viewer.js":
+                body, mime = (Path(__file__).parent/"viewer.js").read_bytes(), "text/javascript; charset=utf-8"
             elif route == "/api":
                 with state["lock"]:
-                    body = json.dumps(state["map"], allow_nan=False).encode()
+                    body = json.dumps(selected_map if selected_map is not None else state["map"], allow_nan=False).encode()
                 mime = "application/json"
             elif route == "/frame.jpg":
                 with state["lock"]:
-                    body = state["jpeg"]
+                    body = selected_jpeg if selected_jpeg is not None else state["jpeg"]
                 mime = "image/jpeg"
+            elif route == "/download" and selected in state.get("map_files", {}):
+                body, mime = state["map_files"][selected].read_bytes(), "application/octet-stream"
             else:
                 self.send_error(404)
                 return

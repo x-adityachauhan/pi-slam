@@ -11,6 +11,8 @@ from rc.dense_reconstruct import read_ply_xyz
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("run", type=Path)
 parser.add_argument("--frames", type=int, default=400)
+parser.add_argument("--reconstruction", default="dense", help="Reconstruction subdirectory to evaluate")
+parser.add_argument("--mesh", action="store_true", help="Evaluate triangle centroids rather than cloud vertices")
 args = parser.parse_args()
 poses = np.loadtxt(args.run/"map_0_keyframes.tum", comments="#")
 phase = poses[:, 0]/((args.frames-1)*.05)*2*np.pi
@@ -24,7 +26,13 @@ scale = np.sum(singular*np.diag(D))/np.mean(np.sum(x*x, axis=1))
 translation = truth.mean(axis=0)-scale*rotation @ poses[:, 1:4].mean(axis=0)
 rng = np.random.default_rng(17)
 centers = np.column_stack((rng.uniform(-2.7, 2.7, 220), rng.uniform(-1.9, 1.9, 220), rng.uniform(3.2, 7, 220)))
-cloud = read_ply_xyz(args.run/"dense/map_0_dense.ply")
+cloud = read_ply_xyz(args.run/args.reconstruction/"map_0_dense.ply")
+if not len(cloud):
+    raise SystemExit("No reconstructed points to evaluate")
+if args.mesh:
+    from rc.view_map import load_faces
+    faces = load_faces(args.run/args.reconstruction/"map_0_mesh.ply", len(cloud))
+    cloud = cloud[faces].mean(axis=1)
 distances = []
 for start in range(0, len(cloud), 2048):
     points = scale*cloud[start:start+2048] @ rotation.T+translation
@@ -33,6 +41,7 @@ for start in range(0, len(cloud), 2048):
     distances.extend(np.min(np.linalg.norm(offset, axis=2), axis=1))
 distances = np.asarray(distances)
 result = {"points": len(cloud), "alignment": "Sim(3), scale intentionally removed",
+    "evaluated": "triangle_centroids" if args.mesh else "cloud_points",
     "physical_accuracy_measurement": False, "units": "procedural scene units",
     "median_nearest_surface_error": float(np.median(distances)),
     "p90_nearest_surface_error": float(np.percentile(distances, 90)),

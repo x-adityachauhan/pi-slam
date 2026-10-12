@@ -15,9 +15,9 @@ at 640×480 / 20 FPS as long as lens/crop/focus/mode do not change.
 
 1. Manual RC-car or handheld test: live tracking and repeatable recordings.
 2. Richer 3D reconstruction: overlapping translated views, optimized per-map
-   poses, disparity consistency filtering and bounded colored voxel fusion.
-   By default, retain only voxels supported by at least two different image pairs;
-   multiple pixels in one pair do not count as independent support.
+   poses, pose-checked stereo pairs and independent-view depth validation.
+   Each retained depth pixel must agree with two other camera views before
+   vectorized voxel fusion. Agreement is tested before voxel downsampling.
 3. Evaluate real tracking availability, map repeatability and independent
    reference measurements. Synthetic tests do not establish physical accuracy.
 4. When ready, add synchronized IMU and measured stereo/depth for metric
@@ -58,20 +58,45 @@ typically about 150 seconds at 20 FPS. The actual capture rate and frame gaps
 determine session duration. Expect roughly a few hundred MB/run depending on
 JPEG size; watch free disk space. Save/export failures leave recorded files intact.
 
+Transient receive stalls are tolerated for up to 15 seconds without discarding
+partially received frame bytes. The Pi allows 10 seconds for a blocked send.
+A closed connection still stops capture; this does not automatically reconnect
+or bridge a tracking gap. The runner saves a summary and any retained map,
+records `capture_error.txt`, and returns status 3 on stream failure. The launcher
+then reconstructs a partial map if tracking had initialized. A run that never
+initialized is explicitly reported as no result (launcher status 4), not shown
+as a successful new map. Restart `start-camera.sh` if the tunnel itself failed.
+
+The camera overlay and pose events include the native feature count. Many
+features alone do not establish depth: matched features must also pass the
+two-view geometry tests. Initialization messages are printed every ten capture
+seconds, and live progress is flushed immediately instead of being buffered.
+
 The launcher prints the unique run directory. It saves:
 
 - atlas.osa and separate map_N.ply / map_N_keyframes.tum.
 - frames.csv and original timestamped JPEG images in frames/.
 - pose_events.jsonl and atomic latest_pose.json for diagnostic monitoring.
 - A copy of camera intrinsics used for the run.
-- dense/map_N_dense.ply: colored reconstructed surfaces for each map.
-- dense/stats.json: accepted/rejected pairs, point count, voxel size, capacity
+- dense_v2/map_N_dense.ply: colored reconstructed surfaces for each map.
+- dense_v2/map_N_mesh.ply: triangles connecting measured, consistent neighboring
+  depth pixels; holes and depth discontinuities are preserved.
+- dense_v2/stats.json: accepted/rejected pairs, point count, voxel size, capacity
   drops and reconstruction errors. Empty/failed reconstructions are reported.
+
+Earlier `dense/` files remain available for comparison. The new report also
+includes descriptor-match/epipolar checks, depth support, cache reads and a
+representative optimized camera view. `--method pairwise` explicitly selects
+the earlier method and writes its original `dense/` destination.
 
 There is no complete watertight mesh and no declaration that unseen space is
 safe. Never merge independently reset maps without estimating their alignment.
-Reconstruction handles horizontal epipolar pairs, including negative disparity;
-vertical/degenerate pairs and insufficient textured matches are rejected.
+Reconstruction handles horizontal and vertical stereo baselines, including
+negative disparity. Low-overlap pairs, inconsistent matches and degenerate
+geometry are rejected. The default CPU budget is two OpenCV threads, up to
+40 candidate pairs per map (maximum configurable budget: 120), and at most 80
+optimized views. Two stereo workers run concurrently with bounded queued data.
+Source images and features are cached; final voxel fusion is vectorized.
 
 View one reconstructed map:
 
@@ -79,10 +104,15 @@ View one reconstructed map:
 bash run-python.sh rc/view_map.py /home/kali/pi-slam/runs/rc-YOUR-RUN
 ```
 
-Open http://127.0.0.1:8090 if a browser does not open automatically. Drag to
-rotate, scroll to zoom, and Fit map to recenter. The largest successful map
-is selected; use --map map_1 to choose another. The browser shows a bounded
-sample for speed; the PLY file retains all fused points.
+Open http://127.0.0.1:8090 if a browser does not open automatically. The viewer
+chooses `dense_v2/` when present, then falls back to `dense/`. Use
+`--reconstruction dense` to inspect the old result. Its camera view aligns
+points with an undistorted optimized reference image. Drag to orbit, scroll
+to zoom, or use Camera view / Orbit controls. The map selector keeps independent
+maps separate. GPU depth testing handles occlusion; point size is adjustable.
+Up to 200,000 points are displayed; Download PLY retains the full mesh when
+available, otherwise the point cloud. The Surfaces checkbox toggles triangles.
+Saved maps load once instead of being transferred twice per second.
 
 To repeat reconstruction without recapturing:
 
@@ -90,6 +120,18 @@ To repeat reconstruction without recapturing:
 bash run-python.sh rc/dense_reconstruct.py /home/kali/pi-slam/runs/rc-YOUR-RUN \
   --calibration /home/kali/pi-slam/runs/rc-YOUR-RUN/intrinsics.json --max-pairs 80
 ```
+
+Use `--max-pairs 24` to reduce postprocessing work at the cost of coverage;
+`--threads 2` controls OpenCV's thread budget. `--min-support 2` means two other
+views agreeing with each reference depth (three cameras in total). Lowering
+this below two is rejected by the revised method. `--output-name NAME` allows
+comparisons in separate subdirectories. Unobserved areas remain holes.
+
+The live camera overlay reports low light and soft images. Move slowly sideways
+with overlap, keeping textured objects at several depths visible. Check lens
+cleanliness/focus if a stationary, well-lit view still looks soft. Image quality
+is also recorded in pose events. Better capture is necessary for complete room
+coverage; the existing recording has tracking gaps.
 
 Existing old SLAM runs have no recorded images and cannot be densified by this
 tool. Capture a new run. Rerunning reconstruction overwrites that run's dense

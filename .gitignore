@@ -21,3 +21,4 @@ __pycache__/
 *.key
 .vscode/
 .idea/
+/.pi-target

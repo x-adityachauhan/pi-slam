@@ -132,7 +132,8 @@ class PipelineTests(unittest.TestCase):
             base=f"http://127.0.0.1:{server.server_port}"
             self.assertEqual(json.loads(urlopen(base+"/api").read())["points"],[[1,2,3]])
             self.assertEqual(urlopen(base+"/frame.jpg").read(),b"test-jpeg")
-            self.assertIn(b"Sparse 3D map",urlopen(base).read())
+            self.assertIn(b'id="map"', urlopen(base).read())
+            self.assertIn(b"DEPTH_TEST", urlopen(base+"/viewer.js").read())
         finally:
             server.shutdown()
             server.server_close()

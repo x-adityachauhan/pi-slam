@@ -1,4 +1,6 @@
 #include <cstdint>
+#include <cerrno>
+#include <cstring>
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -61,11 +63,20 @@ class Stream {
 
     void receive(void* output, size_t length) {
         auto* data = static_cast<uint8_t*>(output);
+        auto progress = std::chrono::steady_clock::now();
         while (length) {
+            if (closed_ || interrupted) throw std::runtime_error("Capture interrupted");
             const auto count = recv(socket_, data, length, 0);
-            if (count <= 0) throw std::runtime_error("Pi camera stream disconnected or timed out");
+            if (count < 0 && errno == EINTR) continue;
+            if (count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                if (std::chrono::steady_clock::now()-progress < std::chrono::seconds(15)) continue;
+                throw std::runtime_error("Pi stream stalled: no bytes received for 15 seconds");
+            }
+            if (count == 0) throw std::runtime_error("Pi stream closed by camera server or SSH tunnel");
+            if (count < 0) throw std::runtime_error(std::string("Pi stream socket error: ")+std::strerror(errno));
             data += count;
             length -= count;
+            progress = std::chrono::steady_clock::now();
         }
     }
     void run() {
@@ -109,7 +120,7 @@ public:
     explicit Stream(int port) {
         socket_ = socket(AF_INET, SOCK_STREAM, 0);
         if (socket_ < 0) throw std::runtime_error("Cannot create camera socket");
-        timeval timeout{10, 0};
+        timeval timeout{1, 0};
         setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
         sockaddr_in address{};
         address.sin_family = AF_INET;
@@ -148,7 +159,8 @@ void write_pose(std::ostream& out, double stamp, const Sophus::SE3f& Twc) {
 }
 
 void write_pose_event(ORB_SLAM3::System& slam, const Frame& frame, int state,
-                      const Sophus::SE3f& Tcw, const fs::path& output, std::ostream& log) {
+                      const Sophus::SE3f& Tcw, const fs::path& output, std::ostream& log,
+                      double brightness, double sharpness) {
     const auto result_time = monotonic_ns();
     std::set<ORB_SLAM3::MapPoint*> unique;
     for (auto* point : slam.GetTrackedMapPoints())
@@ -160,6 +172,9 @@ void write_pose_event(ORB_SLAM3::System& slam, const Frame& frame, int state,
           << ",\"sequence\":" << frame.sequence << ",\"tracking_state\":" << state
           << ",\"map_id\":" << slam.GetAtlasForExport()->GetCurrentMap()->GetId()
           << ",\"tracked_landmarks\":" << unique.size()
+          << ",\"image_brightness\":" << brightness
+          << ",\"image_sharpness\":" << sharpness
+          << ",\"detected_features\":" << slam.GetTrackedKeyPointsUn().size()
           << ",\"metric_scale\":false,\"time_sync_verified\":false"
              ",\"body_extrinsics_validated\":false,\"continuous_local_frame\":false"
              ",\"end_to_end_latency_ms\":null,\"flight_output_enabled\":false"
@@ -203,6 +218,7 @@ size_t export_maps(ORB_SLAM3::System& slam, const fs::path& output) {
 }
 
 int main(int argc, char** argv) {
+    cv::setNumThreads(2);
     if (argc < 4) {
         std::cerr << "Usage: pi_slam_live VOCABULARY CAMERA_YAML OUTPUT_DIR [--headless] [--pose-events] [--record-frames] [--max-frames N] [--seconds N] [--port N]\n";
         return 2;
@@ -252,16 +268,36 @@ int main(int argc, char** argv) {
         uint64_t previous = UINT64_MAX, origin = 0, dropped = 0;
         size_t processed = 0, tracked = 0;
         double total_ms = 0;
+        double brightness = 0, sharpness = 0;
+        bool stream_failed = false;
+        double last_init_warning = -10;
         auto start = std::chrono::steady_clock::now();
         while (!interrupted && !slam->ViewerFinished() && (!max_frames || processed < max_frames) &&
                (!seconds || std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count() < seconds)) {
             Frame frame;
-            if (!stream.read(frame, previous)) continue;
+            try {
+                if (!stream.read(frame, previous)) continue;
+            } catch (const std::exception& exc) {
+                stream_failed = !interrupted;
+                std::cerr << "Capture stopped: " << exc.what() << "; saving partial results.\n";
+                std::ofstream failure(output / "capture_error.txt");
+                failure << exc.what() << '\n';
+                break;
+            }
             if (frame.image.cols != width || frame.image.rows != height)
                 throw std::runtime_error("Camera resolution differs from calibration; recalibrate this capture mode");
             if (!origin) origin = frame.timestamp;
             if (previous != UINT64_MAX && frame.sequence > previous+1) dropped += frame.sequence-previous-1;
             previous = frame.sequence;
+            if (processed % 5 == 0) {
+                cv::Mat gray, laplacian;
+                cv::cvtColor(frame.image, gray, cv::COLOR_BGR2GRAY);
+                brightness = cv::mean(gray)[0];
+                cv::Laplacian(gray, laplacian, CV_32F);
+                cv::Scalar mean, deviation;
+                cv::meanStdDev(laplacian, mean, deviation);
+                sharpness = deviation[0]*deviation[0];
+            }
             double timestamp = double(frame.timestamp-origin)/1e9;
             if (record_frames) {
                 auto name = "frames/" + std::to_string(frame.sequence) + ".jpg";
@@ -275,16 +311,31 @@ int main(int argc, char** argv) {
             auto Tcw = slam->TrackMonocular(frame.image, timestamp);
             total_ms += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now()-before).count();
             int state = slam->GetTrackingState();
-            if (pose_events) write_pose_event(*slam, frame, state, Tcw, output, events);
+            const auto features = slam->GetTrackedKeyPointsUn().size();
+            if (state == 1 && timestamp-last_init_warning >= 10) {
+                std::cout << "NOT INITIALIZED | features " << features
+                          << " | Need overlapping translated views at different depths; "
+                             "rotation alone cannot initialize.\n" << std::flush;
+                last_init_warning = timestamp;
+            }
+            if (pose_events) write_pose_event(*slam, frame, state, Tcw, output, events, brightness, sharpness);
             ++processed;
             if (state == 2 && Tcw.matrix().allFinite()) { ++tracked; write_pose(poses, timestamp, Tcw.inverse()); }
             if (processed % 20 == 0) std::cout << "Frames " << processed << " | state " << state
-                << " | mean tracking " << total_ms/processed << "ms | skipped " << dropped << '\n';
+                << " | mean tracking " << total_ms/processed << "ms | skipped " << dropped << std::endl;
             if (viewer) {
                 cv::Mat display = frame.image.clone();
                 std::string status = state == 2 ? "TRACKING" : state == 1 ? "MOVE CAMERA SIDEWAYS" : "TRACKING LOST";
                 cv::putText(display, status + " | Q: save and quit", cv::Point(10,25),
                             cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(0,255,0), 2);
+                const std::string advice = brightness < 45 ? "MORE LIGHT: tracking needs visible texture" :
+                    sharpness < 45 ? "SOFT IMAGE: steady camera; check lens/focus" :
+                    "Slow sideways motion; keep textured objects in view";
+                cv::putText(display, advice, cv::Point(10,50), cv::FONT_HERSHEY_SIMPLEX,
+                            0.45, cv::Scalar(0,220,255), 1);
+                cv::putText(display, "Features: " + std::to_string(features) +
+                            (features <= 100 ? " | Too little usable texture" : " | Geometry must also agree"),
+                            cv::Point(10,72), cv::FONT_HERSHEY_SIMPLEX, 0.45, cv::Scalar(0,220,255), 1);
                 cv::imshow("Pi camera - ORB-SLAM3", display);
                 int key = cv::waitKey(1) & 0xFF;
                 if (key == 27 || key == 'q') break;
@@ -297,9 +348,12 @@ int main(int argc, char** argv) {
         stats << "{\"processed_frames\":" << processed << ",\"tracked_frames\":" << tracked
               << ",\"skipped_frames\":" << dropped << ",\"exported_points\":" << points
               << ",\"mean_tracking_ms\":" << (processed ? total_ms/processed : 0)
-              << ",\"capture_clock_origin_ns\":" << origin << ",\"metric_scale\":false}\n";
+              << ",\"capture_clock_origin_ns\":" << origin
+              << ",\"stream_failed\":" << (stream_failed ? "true" : "false")
+              << ",\"initialized\":" << (tracked ? "true" : "false")
+              << ",\"metric_scale\":false}\n";
         std::cout << "Saved run to " << output << '\n';
-        return 0;
+        return stream_failed ? 3 : 0;
     } catch (const std::exception& exc) {
         std::cerr << "ERROR: " << exc.what() << '\n';
         if (slam && !shut_down) { slam->Shutdown(); export_maps(*slam, output); }

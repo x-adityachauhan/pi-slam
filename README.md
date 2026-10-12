@@ -2,6 +2,9 @@
 
 **Current target: manual RC-car testing with 3D surface reconstruction.**
 Use [rc/README.md](rc/README.md) and `bash rc/run.sh` on this laptop.
+The current reconstruction uses checked stereo pairs and depth agreement in
+three views; outputs go to `dense_v2/`. The saved-map viewer includes GPU depth
+testing, camera-aligned inspection and separate map selection.
 The new RTX portable package is `pi-slam-rc-rtx5060.tar.gz`.
 Drone integration is future work in [drone/PLAN.md](drone/PLAN.md), not a
 flight-ready feature. The original commands below remain sparse-map tools.
@@ -32,6 +35,9 @@ See [third-party notices](THIRD_PARTY.md) before redistribution.
 The included calibration applies only to the original camera and capture
 mode. Recalibrate a different camera. Change the Pi target with
 `PI_TARGET=ras@YOUR_PI_IP bash start-camera.sh`; SSH passwords are not stored.
+Alternatively, the ignored local `.pi-target` file contains `user@IP` and an
+optional SSH host-key alias on one line. Use an alias only for the same Pi
+whose host key you have already verified; it does not disable key checking.
 Examples below use the original `/home/kali/pi-slam` path; replace it with
 your clone's path if needed. Launchers locate their files relative to themselves.
 
@@ -217,6 +223,11 @@ a prepared build package; its CUDA compilation, runtime speed, and memory
 usage need verification on that hardware. The first laptop has no CUDA GPU.
 
 ## Verification and sources
+
+See [the multiview reconstruction report](verification/MULTIVIEW_REPORT.md)
+for the latest accuracy comparison, room reconstruction and viewer checks.
+The historical results below describe earlier versions. Existing release
+archives do not yet include these latest reconstruction changes.
 
 The transport's real-camera check received 100 frames at approximately
 20 FPS with no sequence gaps. `verification/live_camera.jpg` is that capture's
