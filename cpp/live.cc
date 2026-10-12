@@ -175,6 +175,7 @@ void write_pose_event(ORB_SLAM3::System& slam, const Frame& frame, int state,
           << ",\"image_brightness\":" << brightness
           << ",\"image_sharpness\":" << sharpness
           << ",\"detected_features\":" << slam.GetTrackedKeyPointsUn().size()
+          << ",\"map_count\":" << slam.GetAtlasForExport()->GetAllMaps().size()
           << ",\"metric_scale\":false,\"time_sync_verified\":false"
              ",\"body_extrinsics_validated\":false,\"continuous_local_frame\":false"
              ",\"end_to_end_latency_ms\":null,\"flight_output_enabled\":false"
@@ -269,6 +270,7 @@ int main(int argc, char** argv) {
         size_t processed = 0, tracked = 0;
         double total_ms = 0;
         double brightness = 0, sharpness = 0;
+        uint64_t feature_total = 0;
         bool stream_failed = false;
         double last_init_warning = -10;
         auto start = std::chrono::steady_clock::now();
@@ -312,6 +314,7 @@ int main(int argc, char** argv) {
             total_ms += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now()-before).count();
             int state = slam->GetTrackingState();
             const auto features = slam->GetTrackedKeyPointsUn().size();
+            feature_total += features;
             if (state == 1 && timestamp-last_init_warning >= 10) {
                 std::cout << "NOT INITIALIZED | features " << features
                           << " | Need overlapping translated views at different depths; "
@@ -322,7 +325,9 @@ int main(int argc, char** argv) {
             ++processed;
             if (state == 2 && Tcw.matrix().allFinite()) { ++tracked; write_pose(poses, timestamp, Tcw.inverse()); }
             if (processed % 20 == 0) std::cout << "Frames " << processed << " | state " << state
-                << " | mean tracking " << total_ms/processed << "ms | skipped " << dropped << std::endl;
+                << " | mean tracking " << total_ms/processed << "ms | skipped " << dropped
+                << " | tracked " << 100.0*tracked/processed << "% | features " << features
+                << " | maps " << slam->GetAtlasForExport()->GetAllMaps().size() << std::endl;
             if (viewer) {
                 cv::Mat display = frame.image.clone();
                 std::string status = state == 2 ? "TRACKING" : state == 1 ? "MOVE CAMERA SIDEWAYS" : "TRACKING LOST";
@@ -341,6 +346,7 @@ int main(int argc, char** argv) {
                 if (key == 27 || key == 'q') break;
             }
         }
+        const auto capture_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
         slam->Shutdown();
         shut_down = true;
         auto points = export_maps(*slam, output);
@@ -351,6 +357,10 @@ int main(int argc, char** argv) {
               << ",\"capture_clock_origin_ns\":" << origin
               << ",\"stream_failed\":" << (stream_failed ? "true" : "false")
               << ",\"initialized\":" << (tracked ? "true" : "false")
+              << ",\"delivered_fps\":" << processed/std::max(capture_seconds, .001)
+              << ",\"tracked_pct\":" << (processed ? 100.0*tracked/processed : 0)
+              << ",\"keypoints_mean\":" << (processed ? double(feature_total)/processed : 0)
+              << ",\"map_count\":" << slam->GetAtlasForExport()->GetAllMaps().size()
               << ",\"metric_scale\":false}\n";
         std::cout << "Saved run to " << output << '\n';
         return stream_failed ? 3 : 0;

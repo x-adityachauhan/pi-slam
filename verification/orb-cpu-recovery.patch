@@ -1,0 +1,50 @@
+diff --git a/include/Tracking.h b/include/Tracking.h
+index 863c98e..c296ef0 100644
+--- a/include/Tracking.h
++++ b/include/Tracking.h
+@@ -321,6 +321,7 @@ protected:
+     unsigned int mnLastRelocFrameId;
+     double mTimeStampLost;
+     double time_recently_lost;
++    double visual_recovery_seconds = 3.0;
+ 
+     unsigned int mnFirstFrameId;
+     unsigned int mnInitialFrameId;
+diff --git a/src/Tracking.cc b/src/Tracking.cc
+index 5191451..4453ffe 100644
+--- a/src/Tracking.cc
++++ b/src/Tracking.cc
+@@ -49,6 +49,14 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
+     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
+ {
+     // Load camera parameters from settings file
++    {
++        cv::FileStorage cpuSettings(strSettingPath, cv::FileStorage::READ);
++        const auto recovery = cpuSettings["CPU.VisualRecoverySeconds"];
++        if (!recovery.empty()) {
++            visual_recovery_seconds = std::max(3.0, std::min(30.0, double(recovery)));
++            std::cout << "Visual relocalization window: " << visual_recovery_seconds << " seconds" << std::endl;
++        }
++    }
+     if(settings){
+         newParameterLoader(settings);
+     }
+@@ -1963,7 +1971,8 @@ void Tracking::Track()
+                     {
+                         mState = LOST;
+                     }
+-                    else if(pCurrentMap->KeyFramesInMap()>10)
++                    else if(pCurrentMap->KeyFramesInMap()>10 ||
++                            (mSensor == System::MONOCULAR && visual_recovery_seconds > 3.0))
+                     {
+                         // cout << "KF in map: " << pCurrentMap->KeyFramesInMap() << endl;
+                         mState = RECENTLY_LOST;
+@@ -2003,7 +2012,7 @@ void Tracking::Track()
+                         bOK = Relocalization();
+                         //std::cout << "mCurrentFrame.mTimeStamp:" << to_string(mCurrentFrame.mTimeStamp) << std::endl;
+                         //std::cout << "mTimeStampLost:" << to_string(mTimeStampLost) << std::endl;
+-                        if(mCurrentFrame.mTimeStamp-mTimeStampLost>3.0f && !bOK)
++                        if(mCurrentFrame.mTimeStamp-mTimeStampLost>visual_recovery_seconds && !bOK)
+                         {
+                             mState = LOST;
+                             Verbose::PrintMess("Track Lost...", Verbose::VERBOSITY_NORMAL);

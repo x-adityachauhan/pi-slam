@@ -5,6 +5,7 @@ PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 mkdir -p "$PROJECT_DIR/runs"
 RUN_DIR="$(mktemp -d "$PROJECT_DIR/runs/rc-$(date +%Y%m%d-%H%M%S)-XXXXXX")"
 cp -- "$PROJECT_DIR/calibration/camera.yaml" "$RUN_DIR/camera.yaml"
+bash "$PROJECT_DIR/run-python.sh" rc/cpu_settings.py "$PROJECT_DIR/calibration/camera.yaml" "$RUN_DIR/camera.yaml" --profile candidate
 cp -- "$PROJECT_DIR/calibration/intrinsics.json" "$RUN_DIR/intrinsics.json"
 printf '\nSystem.SaveAtlasToFile: "atlas"\n' >> "$RUN_DIR/camera.yaml"
 cd "$RUN_DIR"

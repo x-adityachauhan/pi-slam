@@ -42,4 +42,9 @@ prepare_source() {
 }
 prepare_source ORB_SLAM3 https://github.com/UZ-SLAMLab/ORB_SLAM3.git 4452a3c4ab75b1cde34e5505a36ec3f9edcdc4c4 "$PROJECT_DIR/verification/orb-kali.patch"
 prepare_source Pangolin https://github.com/stevenlovegrove/Pangolin.git aff6883c83f3fd7e8268a9715e84266c42e2efe3 "$PROJECT_DIR/verification/pangolin-kali.patch"
+RECOVERY_PATCH="$PROJECT_DIR/verification/orb-cpu-recovery.patch"
+if ! git -C "$PROJECT_DIR/vendor/ORB_SLAM3" apply --reverse --check "$RECOVERY_PATCH" >/dev/null 2>&1; then
+  git -C "$PROJECT_DIR/vendor/ORB_SLAM3" apply --check "$RECOVERY_PATCH"
+  git -C "$PROJECT_DIR/vendor/ORB_SLAM3" apply "$RECOVERY_PATCH"
+fi
 exec bash "$PROJECT_DIR/build-cpu.sh"
